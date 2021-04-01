@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link href="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+<link href="/static/assets/css/metismenu.min.css" rel="stylesheet" type="text/css">
+<link href="/static/assets/css/icons.css" rel="stylesheet" type="text/css">
+<link href="/static/assets/css/style.css" rel="stylesheet" type="text/css">
+{% endblock %}
+{% block title %}搜索 - search{% endblock %}
+{% block top %}搜索 - search{% endblock %}
+{% block content %}
+{{ super() }}
+<div class='container-fluid'>
+<div class="row">
+		<div class="col-lg-9">
+			<div class="page-title-box">
+				<div class="row align-items-center">
+					<div class="col-md-12">
+						<h4 class="page-title mb-0">搜索</h4>
+						<ol class="breadcrumb m-0">
+							<li class="breadcrumb-item"><a href="/">中学生综合素质评定系统</a></li>	
+							<li class="breadcrumb-item"><a href="/search/">搜索</a></li>
+						</ol>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>

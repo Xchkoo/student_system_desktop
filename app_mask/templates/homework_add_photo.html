@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh">
+<meta charset="UTF-8">
+<title>上传图片</title>
+<h1>上传图片</h1>
+<hr>
+<br>
+<h1>{{ msg }}</h1>
+<form method=post enctype=multipart/form-data action="/home_add_photo/">
+    时间： <input type="text" name="time" value="2020/07/02"><br><br>
+    图片：
+    <input type=file name=file>
+    <br><br>
+    <input type=submit value=提交>
+</form>
+
+
+<br><br><br><br><br><br>
+<hr>
+<a href="/">--->返回主页</a>
+<hr>
+</html>

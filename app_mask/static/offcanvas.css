@@ -1,0 +1,23 @@
+@include forLargeScreen($off-canvas-breakpoint){
+  .off-canvas{
+    &.off-canvas-siderbar-show{
+      .off-canvas-toggle{
+        display: none;
+      }
+      .off-canvas-sidebar{
+        flex: 0 0 auto;
+        position: relative;
+        transform: none;
+        height: auto;
+        @if $r2l{
+          order: 1;
+        } @else {
+          order: -1;
+        }
+      }
+      .off-canvas-overlay{
+        display: none !important;
+      }
+    }
+  }
+}

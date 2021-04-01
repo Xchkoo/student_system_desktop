@@ -1,0 +1,17 @@
+venv/
+venv_win/
+
+*.pyc
+__pycache__/
+
+instance
+
+.pytest_cache/
+.coverage
+htmlcov/
+
+dist/
+build/
+*.egg-info/
+
+/Foxia/

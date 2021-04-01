@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}查看人脸库{% endblock %}
+{% block top %}查看人脸库{% endblock %}
+{% block head %}
+  {{super()}}
+  <link href="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+  <link href="/static/assets/css/metismenu.min.css" rel="stylesheet" type="text/css">
+  <link href="/static/assets/css/icons.css" rel="stylesheet" type="text/css">
+  <link href="/static/assets/css/style.css" rel="stylesheet" type="text/css">
+{% endblock %}
+{% block content %}
+    {{ super() }}
+	<div class='container-fluid' id='insert'>
+		<div class="row">
+				<div class="col-lg-9">
+					<div class="page-title-box">
+						<div class="row align-items-center">
+							<div class="col-md-12">
+								<h4 class="page-title mb-0">人脸库管理</h4>
+								<ol class="breadcrumb m-0">
+									<li class="breadcrumb-item"><a href="/console/">控制台</a></li>
+									<li class="breadcrumb-item"><a href="/face_view/">人脸库</a></li>
+									<li class="breadcrumb-item"><a href="/face_view/">人脸库管理</a></li>
+								</ol>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+	<div id='main'></div>
+{% endblock %}
+{% block script %}
+{{ super() }}
+<script src="/static/assets/pages/form-advanced.js"></script>
+<script src="/static/assets/plugins/bootstrap-filestyle/js/bootstrap-filestyle.min.js"></script>
+<script>
+$(document).ready(function(){
+	$.ajax({
+		type: "POST",
+		dataType: "json",
+		url: "/database/api_get_data/face_view/",
+		success:function(data){
+			for(var i=1;i<=data['num'];i++)
+			$("#main").append(" <div class=\"row\" id='row" +i+ "'><div class=\"col-md-6 col-xl-3\"><div class=\"card\"><div class=\"card-body\"><h4 class=\"card-title font-20 mt-0\">"+ data['info'][i]['name'] +"</h4><h6 class=\"card-subtitle text-muted\">Support card subtitle</h6></div><img class=\"img-fluid\" src=\"assets/images/small/img-4.jpg\" alt=\"Card image cap\"><div class=\"card-body\"><p class=\"card-text\">Some quick example text to build on the card title and makeup the bulk of the card's content.</p><a href=\"\" class=\"card-link\">Card link</a><a href=\"\" class=\"card-link\">Another link</a></div></div></div>");
+			}
+			data['info']['path']
+		error:function(){
+			mdui.snackbar({
+			message: '数据提交失败'
+			});
+		},
+	})
+	})
+</script>
+{% endblock%}[]

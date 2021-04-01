@@ -1,0 +1,77 @@
+
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="中学生综合素质评定系统">
+    <meta name="author" content="Xchkoo">
+    <link rel="icon" href="/static/image/favicon.ico">
+    <title>中学生综合素质评定系统</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/cover.css" rel="stylesheet">
+
+  </head>
+
+  <style>
+  #main{
+  width: 100%;
+  height: 100%;
+  background-repeat:no-repeat ;
+  background-size:100% 100%;
+  background-attachment: fixed;"
+  }
+  </style>
+    <div class="site-wrapper" id="main">
+
+      <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+          <div class="masthead clearfix">
+            <div class="inner">
+              <h3 class="masthead-brand">中学生综合素质评定系统</h3>
+              <nav>
+                <ul class="nav masthead-nav">
+                  <li class="active"><a href="/">Home</a></li>
+                  <li><a href="/about/">About</a></li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+
+          <div class="inner cover">
+            <h1 class="cover-heading">中学生综合素质评定系统</h1>
+            <p class="lead">
+　　本解决方案通过智能识别表格和人脸识别系统来智能量化中学生综合素质评定。</p>
+            <p class="lead">
+              <a href="/console/" class="btn btn-lg btn-default">控制台</a>
+            </p>
+          </div>
+
+          <div class="mastfoot">
+            <div class="inner">
+              <p>Created using <a href="http://getbootstrap.com">Bootstrap</a> & <a href="http://mdui.org">MDUI</a>, by <a href="https://github.com/Xchkoo">@Xchkoo</a>.</p>
+              <p>&copy; copyright 2021 Xchkoo All rights reserved.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script>
+        var imgArr = ["/static/image/xuejun_image1.jpeg"];
+        var index =parseInt(Math.random()*(imgArr.length));
+        var currentImage=imgArr[index];
+        document.getElementById("main").style.backgroundImage="url("+currentImage+")";
+    </script>
+  </body>
+</html>

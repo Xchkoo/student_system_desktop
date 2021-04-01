@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<link href="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+<link href="/static/assets/css/metismenu.min.css" rel="stylesheet" type="text/css">
+<link href="/static/assets/css/icons.css" rel="stylesheet" type="text/css">
+<link href="/static/assets/css/style.css" rel="stylesheet" type="text/css">
+{% endblock %}
+{% block title %}人脸注册 - register{% endblock %}
+{% block top %}人脸注册{% endblock %}
+{% block content %}
+{{ super() }}
+<div class='container-fluid'>
+<div class="row">
+		<div class="col-lg-9">
+			<div class="page-title-box">
+				<div class="row align-items-center">
+					<div class="col-md-12">
+						<h4 class="page-title mb-0">人脸注册</h4>
+						<ol class="breadcrumb m-0">
+							<li class="breadcrumb-item"><a href="/">中学生综合素质评定系统</a></li>
+							<li class="breadcrumb-item"><a href="/register/">人脸库</a></li>
+							<li class="breadcrumb-item"><a href="/register/">人脸注册</a></li>
+						</ol>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<div class="row">
+<div class="col-lg-9">
+<div class="card">
+<div class="card-body">
+<form id="rg_form">
+<div class="mdui-textfield mdui-textfield-floating-label">
+    <label class="mdui-textfield-label">姓名：</label>
+    <input class="mdui-textfield-input" id="name" name="name"/>
+	<div class="form-group">
+		<label>请插入图片：</label> <input type="file" class="filestyle" data-buttonname="btn-secondary " name='file' id='file'>
+	</div>
+	</div>
+	<button id="submitbtn" class="mdui-btn mdui-btn-raised mdui-ripple" >提交</button>
+	</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+
+{% endblock %}
+{% block script%}
+{{super()}}
+<script src="/static/assets/pages/form-advanced.js"></script>
+<script src="/static/assets/plugins/bootstrap-filestyle/js/bootstrap-filestyle.min.js"></script>
+<script>
+$(function(){
+	$("#submitbtn").click(function(){
+		$("#rg_form").ajaxForm({
+			url: "/register/",
+			type: "POST",
+			dataType: 'json',
+			clearForm:true,
+			success:function(res){
+				mdui.snackbar({
+					message: res['msg']
+				});
+			},
+			error:function(){
+				mdui.snackbar({
+					message: 'error!'
+				});
+			}
+		});
+	});
+});
+</script>
+
+{% endblock %}
