@@ -1,5 +1,6 @@
 from flask import g
 import sqlite3
+import json
 from app_mask import app, config
 
 
@@ -17,12 +18,23 @@ def close_connection(exception):
         db.close()
 
 
-def enter(STUDENT_ID, PATH, is_mask, POSITION, TIME):
+def class_add_photo(name, path, lesson, time, annotation):
+    t_id = name_to_trans_id(name)
+    conn = sqlite3.connect(config.DATABASE)
+    c = conn.cursor()
+    c.execute("INSERT INTO SYSTEM (TYPE,STUDENT_ID,PATH,LESSON,annotation,TIME)"
+              + "VALUES ('CLASS','"+str(t_id) + "','" + str(path) + "','" + str(lesson)
+              + "','" + str(annotation) + "','" + str(time) + "');")
+    conn.commit()
+    conn.close()
+
+
+def enter(student_id, path, is_mask, position, time):
     conn = sqlite3.connect(config.DATABASE)
     c = conn.cursor()
     c.execute("INSERT INTO SYSTEM (TYPE, STUDENT_ID, PATH, is_mask, POSITION, TIME) "
-              + "VALUES ( 'MASK', '" + str(STUDENT_ID) + "','" + str(PATH) + "', " +
-              str(is_mask) + ",'" + str(POSITION) + "','" + str(TIME) + "');")
+              + "VALUES ( 'MASK', '" + str(student_id) + "','" + str(path) + "', " +
+              str(is_mask) + ",'" + str(position) + "','" + str(time) + "');")
     conn.commit()
     conn.close()
 
@@ -48,26 +60,62 @@ def register_delete(trans_id):
     conn.close()
 
 
+def add_homework(name, path, subject, homework, is_commit, time):
+    t_id = name_to_trans_id(name)
+    if t_id == -1:
+        return {'msg': 'FAIL'}
+    conn = sqlite3.connect(config.DATABASE)
+    c = conn.cursor()
+    c.execute("INSERT INTO SYSTEM (TYPE,STUDENT_ID,PATH,LESSON,HOMEWORK,is_commit,TIME) VALUES ('HOMEWORK','"
+              + str(t_id)+"','"
+              + str(path)+"','"
+              + str(subject) + "','"
+              + str(homework)+"','"
+              + str(is_commit) + "','"
+              + str(time) + "');")
+    conn.commit()
+    conn.close()
+    return {'msg': 'SUCCESS'}
 # ---------------- 以下是统计模块 ---------------------- #
-def mask_mask_num():
-    mask_wp = mask_nwp = 0
-    return {'mask_wearing_percent':  mask_wp, 'mask_not_wearing_percent': mask_nwp}
+# def mask_num():
+#     mask_wp = mask_nwp = 0
+#     return {'mask_wearing_percent':  mask_wp, 'mask_not_wearing_percent': mask_nwp}
 
 
-def get_stu_info():
+# def get_stu_info():
+#     conn = sqlite3.connect(config.DATABASE)
+#     c = conn.cursor()
+#     stu_info = c.execute("SELECT * FROM NAME WHERE NAME IS NOT NULL")
+#     return stu_info
+#
+#
+# def count_person():
+#     conn = sqlite3.connect(config.DATABASE)
+#     c = conn.cursor()
+#     num = c.execute('SELECT count(*) FROM TRANS')
+#     return num
+
+# ---------------- 以下是查询模块 ------------------ #
+
+def trans_id_to_name(trans_id):
     conn = sqlite3.connect(config.DATABASE)
     c = conn.cursor()
-    stu_info = c.execute("SELECT * FORM NAME WHERE NAME IS NOT NULL")
-    print(stu_info)
-    return stu_info
+    sc = c.execute('SELECT * FROM TRANS WHERE NAME IS NOT NULL')
+    for row in sc:
+        if row[0] == trans_id:
+            return row[1]
+    return 'NaN'
 
 
-def count_person():
+def name_to_trans_id(name):
     conn = sqlite3.connect(config.DATABASE)
     c = conn.cursor()
-    num = c.execute('SELECT count(*) FROM TRANS')
-    return num
+    sc = c.execute('SELECT * FROM TRANS WHERE NAME IS NOT NULL')
+    for row in sc:
+        if row[1] == name:
+            return row[0]
+    return -1
 
-# ---------------- end ------------------ #
+
 if __name__ == '__main__':
     register_delete("5")

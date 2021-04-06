@@ -1,7 +1,8 @@
 import requests
+import json
 import base64
 import time
-from app_mask import face_detect
+from app_mask import face_detect, local_db
 
 ak = 'BuWEEPE7UUg5dGmGObDyEX1s'
 sk = 'ddkiWK91Yudkb5P0iMsh9LR4WCnkwIdO'
@@ -18,14 +19,14 @@ def ocr(path):
     result_url = result_url + "?access_token=" + at
     headers = {'content-type': 'application/x-www-form-urlencoded'}
     response = requests.post(request_url, data=request_params, headers=headers)
-    print(response.json())
     request_id = response.json()['result'][0]['request_id']
-    print(request_id)
     time.sleep(6)
-    result_params = {"request_id": str(request_id), "result_type": "excel"}
+    result_params = {"request_id": str(request_id), "result_type": "json"}
     result = requests.post(result_url, data=result_params, headers=headers)
-    print(result.json())
+    res = result.json()['result']['result_data']
+    return res
 
 
 if __name__ == '__main__':
-    ocr("../表格数据.jpg")
+    res = ocr("../表格.PNG")
+    print(res)

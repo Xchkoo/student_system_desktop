@@ -2,6 +2,7 @@ from app_mask import app, config, local_db, face_detect, ocr
 from flask import render_template, request, redirect, url_for, jsonify
 from werkzeug.utils import secure_filename
 import os
+import json
 
 
 @app.route('/', methods=['GET'])
@@ -69,12 +70,12 @@ def check_add_photo():
         time = request.form['time']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER']+'ADD_PHOTO/', filename))
-            res = face_detect.mask_detect(path=app.config['UPLOAD_FOLDER'] + "ADD_PHOTO/" + filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER']+'ADD_PHOTO/check/', filename))
+            res = face_detect.mask_detect(path=app.config['UPLOAD_FOLDER'] + "ADD_PHOTO/check/" + filename)
             if res['msg'] == 'SUCCESS':
                 for n in range(res['num']):
-                    local_db.enter(STUDENT_ID=res['info'][n]['student_id'], PATH=str(app.config['UPLOAD_FOLDER'] + "ADD_PHOTO/" + filename),
-                                   is_mask=res['info'][n]['is_mask'], POSITION=pos, TIME=time)
+                    local_db.enter(student_id=res['info'][n]['student_id'], path=str(app.config['UPLOAD_FOLDER'] + "ADD_PHOTO/" + filename),
+                                   is_mask=res['info'][n]['is_mask'], position=pos, time=time)
                     return jsonify({"msg": "SUCCESS"})
         else:
             return jsonify({'msg': 'FILE ILLEGAL'})
@@ -91,13 +92,53 @@ def check_result():
 @app.route('/homework_add_photo/', methods=['GET', 'POST'])
 def homework_add_photo():
     if request.method == 'POST':
-        file = request.files['file']
+        subject = request.form['subject']
+        homework = request.form['homework']
+        time = request.form['time']
+        file = request.files['photo']
+        homework = request.form['homework']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'] + '/ADD_PHOTO/homework/', filename))
             res = ocr.ocr(path=app.config['UPLOAD_FOLDER'] + "/ADD_PHOTO/homework/" + filename)
-            res.json()
-            return render_template('homework_add_photo.html', msg='SUCCESS')
+            res = json.loads(res)
+            # 处理部分
+            data = res['forms'][0]['body']
+            people_num = 0  # 一共有多少人
+            is_commit_row = 0
+            name_row = 0  # 名字矩形的序号,这个要到第一个名字就加 1
+            for i in data:
+                if i['column'][0] == 1:
+                    if people_num < i['row'][0]:
+                        people_num = i['row'][0]
+                else:
+                    break
+            people_num = people_num - 1
+            for i, element in enumerate(data):
+                if element['word'] == '姓名':
+                    name_row = i  # name_row = 4
+                    break
+
+            for i, element in enumerate(data):
+                if element['word'] in config.is_commit_word:
+                    is_commit_row = i  # is_commit_row = 8
+                    break
+
+            for i in range(people_num):  # 因为这个range默认从0开始 所以要加 1
+                if data[is_commit_row + i + 1]['word'] == '1':
+                    is_commit = 1
+                else:
+                    is_commit = 0
+                ldb_res = local_db.add_homework(name=data[name_row + i + 1]['word'],
+                                                path=app.config['UPLOAD_FOLDER'] + "/ADD_PHOTO/homework/" + filename,
+                                                subject=subject, homework=homework,
+                                                is_commit=is_commit, time=time)
+                if ldb_res['msg'] == 'FAIL':
+                    return jsonify({'msg': 'Fail: unregister name!'})
+
+            return jsonify({'msg': 'SUCCESS'})
+        else:
+            return jsonify({'msg': 'FILE ILLEGAL'})
     return render_template('homework_add_photo.html')
 
 
@@ -109,6 +150,20 @@ def homework_result():
 # class
 @app.route('/class_add_photo/', methods=['GET', 'POST'])
 def class_add_photo():
+    if request.method == 'POST':
+        file = request.files['photo']
+        name = request.form['name']
+        lesson = request.form['lesson']
+        reason = request.form['reason']
+        time = request.form['time']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'] + '/ADD_PHOTO/', filename))
+            local_db.class_add_photo(name=name, path=app.config['UPLOAD_FOLDER'] + "ADD_PHOTO/" + filename,
+                                     lesson=lesson, time=time, annotation=reason)
+            return jsonify({'msg': 'SUCCESS'})
+        else:
+            return jsonify({'msg': 'FILE ILLEGAL'})
     return render_template('class_add_photo.html')
 
 
