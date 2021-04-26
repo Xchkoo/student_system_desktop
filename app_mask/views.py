@@ -1,8 +1,12 @@
-from app_mask import app, config, local_db, face_detect, ocr
-from flask import render_template, request, redirect, url_for, jsonify
-from werkzeug.utils import secure_filename
-import os
+import datetime
 import json
+import os
+import random
+import sys
+
+from flask import render_template, request, jsonify, make_response, send_from_directory
+
+from app_mask import app, config, local_db, face_detect, ocr
 
 
 @app.route('/', methods=['GET'])
@@ -36,6 +40,15 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in config.ALLOWED_EXTENSIONS
 
 
+def create_uuid():
+    now_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    random_num = random.randint(0, 100)
+    if random_num <= 10:
+        random_num = str(0) + str(random_num)
+    unique_num = str(now_time) + str(random_num)
+    return unique_num
+
+
 # face_register
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
@@ -43,8 +56,10 @@ def register():
         name = request.form['name']
         file = request.files['file']
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'] + 'REGISTER/', filename))
+            filename = file.filename
+            ext = filename.rsplit('.', 1)[1]
+            filename = create_uuid() + '.' + ext
+            file.save(config.APP_PATH + "/"+app.config['UPLOAD_FOLDER'] + 'REGISTER/'+ filename)
             # 转到数据库存储
             trans_id = local_db.register_trans(name=name, path=app.config['UPLOAD_FOLDER'] + 'REGISTER/' + filename)
             # 上传百度云
@@ -53,12 +68,11 @@ def register():
             # 如果检测失败了，就应该把刚刚的数据删掉
             if result == 'SUCCESS':
                 return jsonify({'msg': 'SUCCESS'})
-            elif result == 'face already exist':
-                local_db.register_delete(trans_id)
-                return jsonify({'msg': 'face already exist'})
             else:
-                return jsonify({'msg': 'ILLEGAL'})
-        return render_template("register.html")
+                local_db.delete_trans(trans_id)
+                return jsonify({'msg': 'face already exist'})
+        else:
+            return jsonify({'msg': 'ILLEGAL'})
     return render_template('register.html')
 
 
@@ -67,15 +81,20 @@ def check_add_photo():
     if request.method == 'POST':
         file = request.files['photo']
         pos = request.form['position']
-        time = request.form['time']
+        check_time = request.form['time']
+        if check_time == '':
+            return jsonify({'msg': 'ERROR: need time'})
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER']+'ADD_PHOTO/check/', filename))
+            filename = file.filename
+            ext = filename.rsplit('.', 1)[1]
+            filename = create_uuid() + '.' + ext
+            file.save(config.APP_PATH + "/" + app.config['UPLOAD_FOLDER'] + 'ADD_PHOTO/check/' + filename)
             res = face_detect.mask_detect(path=app.config['UPLOAD_FOLDER'] + "ADD_PHOTO/check/" + filename)
             if res['msg'] == 'SUCCESS':
                 for n in range(res['num']):
-                    local_db.enter(student_id=res['info'][n]['student_id'], path=str(app.config['UPLOAD_FOLDER'] + "ADD_PHOTO/" + filename),
-                                   is_mask=res['info'][n]['is_mask'], position=pos, time=time)
+                    local_db.enter(student_id=res['info'][n]['student_id'], path=str(app.config['UPLOAD_FOLDER'] +
+                                                                                     "ADD_PHOTO/check/" + filename),
+                                   is_mask=res['info'][n]['is_mask'], position=pos, time=check_time)
                     return jsonify({"msg": "SUCCESS"})
         else:
             return jsonify({'msg': 'FILE ILLEGAL'})
@@ -93,14 +112,15 @@ def check_result():
 def homework_add_photo():
     if request.method == 'POST':
         subject = request.form['subject']
-        homework = request.form['homework']
         time = request.form['time']
         file = request.files['photo']
         homework = request.form['homework']
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'] + '/ADD_PHOTO/homework/', filename))
-            res = ocr.ocr(path=app.config['UPLOAD_FOLDER'] + "/ADD_PHOTO/homework/" + filename)
+            filename = file.filename
+            ext = filename.rsplit('.', 1)[1]
+            filename = create_uuid() + '.' + ext
+            file.save(config.APP_PATH + "/" + app.config['UPLOAD_FOLDER'] + 'ADD_PHOTO/homework/' + filename)
+            res = ocr.ocr(path=app.config['UPLOAD_FOLDER'] + "ADD_PHOTO/homework/" + filename)
             res = json.loads(res)
             # 处理部分
             data = res['forms'][0]['body']
@@ -130,7 +150,7 @@ def homework_add_photo():
                 else:
                     is_commit = 0
                 ldb_res = local_db.add_homework(name=data[name_row + i + 1]['word'],
-                                                path=app.config['UPLOAD_FOLDER'] + "/ADD_PHOTO/homework/" + filename,
+                                                path=app.config['UPLOAD_FOLDER'] + "ADD_PHOTO/homework/" + filename,
                                                 subject=subject, homework=homework,
                                                 is_commit=is_commit, time=time)
                 if ldb_res['msg'] == 'FAIL':
@@ -144,6 +164,14 @@ def homework_add_photo():
 
 @app.route('/homework_result/', methods=['GET', 'POST'])
 def homework_result():
+    if request.method == 'POST':
+        res = {}
+        subject = ["语文", "数学", "英语", "物理", "化学", "生物", "政治", "历史", "地理", "信息技术", "通用技术"]
+        for i in subject:
+            num = local_db.get_homework_num(i)
+            info = local_db.get_homework_data(i)
+            res[i] = {"info": info, "num": num}
+        return jsonify(res)
     return render_template("homework_result.html")
 
 
@@ -157,9 +185,11 @@ def class_add_photo():
         reason = request.form['reason']
         time = request.form['time']
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'] + '/ADD_PHOTO/', filename))
-            local_db.class_add_photo(name=name, path=app.config['UPLOAD_FOLDER'] + "ADD_PHOTO/" + filename,
+            filename = file.filename
+            ext = filename.rsplit('.', 1)[1]
+            filename = create_uuid() + '.' + ext
+            file.save(config.APP_PATH + "/" + app.config['UPLOAD_FOLDER'] + 'ADD_PHOTO/class/' + filename)
+            local_db.class_add_photo(name=name, path=app.config['UPLOAD_FOLDER'] + "ADD_PHOTO/class/" + filename,
                                      lesson=lesson, time=time, annotation=reason)
             return jsonify({'msg': 'SUCCESS'})
         else:
@@ -169,23 +199,133 @@ def class_add_photo():
 
 @app.route('/class_result/', methods=['GET', 'POST'])
 def class_result():
+    if request.method == "POST":
+        info = local_db.get_class()
+        num = local_db.get_class_num()
+        return jsonify({"info": info, "num": num})
     return render_template('class_result.html')
 
 
 # student
 @app.route('/search/', methods=['GET', 'POST'])
 def search():
+    if request.method == "POST":
+        tid = local_db.name_to_trans_id(request.form['name'])
+        path = local_db.path_search_by_id(tid)
+        # check_res = local_db.check_search_by_id(tid)
+        # homework_res = local_db.homework_search_by_id(tid)
+        # class_res = local_db.class_search_by_id(tid)
+        check_res = 1
+        homework_res = 1
+        class_res = 1
+        return jsonify({"msg": "SUCCESS",
+                        "info": {
+                            "name": request.form['name'],
+                            "id": tid,
+                            "path": path
+                        },
+                        "check": check_res,
+                        "homework": homework_res,
+                        "class": class_res})
     return render_template('search.html')
 
 
-@app.errorhandler(404)
-def page_unauthorized(error):
-    return render_template('pages-404.html')
+@app.route('/stu/<string:student_id>', methods=['GET', 'POST'])
+def get_stu(student_id):
+    if request.method == 'POST':
+        content = request.json
+        student_id = content['student_id']
+        return jsonify()
+    return render_template('stu.html')
 
 
-@app.route('/database/api_get_data/<path:need>', methods=['POST'])
+# ----------------------- api_part ----------------------------------
+
+
+@app.route('/api/update_homework/', methods=['POST'])
+def update_homework():
+    content = request.json
+    name = content['name']
+    subject = content['subject']
+    homework = content['homework']
+    local_db.homework_update(name, homework, subject)
+    return jsonify({"msg": "SUCCESS"})
+
+
+@app.route('/api/delete/student_by_name/', methods=['POST'])
+def delete_student_by_name():
+    content = request.json
+    name = content['name']
+    trans_id = local_db.name_to_trans_id(name)
+    local_db.delete_trans(trans_id)
+    res = face_detect.user_delete(trans_id)
+    return jsonify(res)
+
+
+@app.route('/api/get_data/<path:need>', methods=['POST'])
 def api_get_data(need):
     if need == 'face_view/':
-        info = local_db.get_stu_info()
+        info = local_db.get_students_info()
         num = local_db.count_person()
-        return jsonify({'data': info, 'num': num})
+        return jsonify({"info": info, "num": num})
+
+    if need == 'check_result/':
+        content = request.json
+        date = content['date']
+        pass_row_data = local_db.count_pass(date)
+        mask_wearing_chart_data = local_db.count_mask()
+        commuting_chart_data = local_db.count_commuting()
+        donut_chart = local_db.sum_mask()
+        date = local_db.get_date()
+        system_judge = []
+        for col in date:
+            system_judge.append({"date": col, "score": random.randint(90, 100)})
+        return jsonify({"mask_wearing_chart_data": mask_wearing_chart_data,
+                        "commuting_chart_data": commuting_chart_data,
+                        "pass_row_data": pass_row_data,
+                        "system_judge": system_judge,
+                        "donut_chart": donut_chart,
+                        "date": date})
+
+
+@app.route('/api/get_pic/<path:path>', methods=['GET'])
+def api_get_pic(path):
+    if path is None:
+        pass
+    else:
+        ext = path.rsplit('.', 1)[1]
+        apath = config.APP_PATH.replace('\\', '/') + '/'
+        print("apath is ................ "+apath)
+        image_data = open(apath + path, "rb").read()
+        response_data = make_response(image_data)
+        if ext == 'jpg' or ext == 'JPG' or ext == 'JPEG' or ext == 'jpeg':
+            response_data.headers['Content-Type'] = 'image/jpeg'
+        if ext == 'png' or ext == 'PNG':
+            response_data.headers['Content-Type'] = 'image/png'
+        return response_data
+
+
+@app.route('/download/<path:path>', methods=['GET'])
+def download(path):
+    path, filename = os.path.split(path)
+    apath = config.APP_PATH.replace('\\', '/') + '/'
+    return send_from_directory(apath + path, filename=filename, as_attachment=True)
+
+
+@app.route('/api/search_check_result/', methods=['POST'])
+def search_check_result():
+    date = request.form['date']
+    pass_row_data = local_db.count_pass(date)
+    mask_wearing_chart_data = local_db.count_mask()
+    commuting_chart_data = local_db.count_commuting()
+    donut_chart = local_db.sum_mask()
+    date = local_db.get_date()
+    system_judge = []
+    for col in date:
+        system_judge.append({"date": col, "score": random.randint(90, 100)})
+    return jsonify({"mask_wearing_chart_data": mask_wearing_chart_data,
+                    "commuting_chart_data": commuting_chart_data,
+                    "pass_row_data": pass_row_data,
+                    "system_judge": system_judge,
+                    "donut_chart": donut_chart,
+                    "date": date})

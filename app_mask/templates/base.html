@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="/static/mdui/css/mdui.min.css"/>
 <style>
 	a:visited,a:hover,a:active{
-	color:#ff00ff;
+	color:#000000;
 	}
   .mastfoot {
   color: #999; /* IE8 proofing */
@@ -45,33 +45,76 @@
 </style>
   {% endblock %}
 </head>
-<body class="mdui-drawer-body-left">
-<div class="mdui-toolbar mdui-color-deep-purple-accent">
-  <a id="toggle" class="mdui-btn mdui-btn-icon "><i class="mdui-icon material-icons">menu</i></a>
 
-  <span class="mdui-typo-title"><div align="center">{% block top %}中学生综合素质评定系统{% endblock %}</div></span>
+<body class="mdui-drawer-body-left">
+	<!-- Loader -->
+	<div id="preloader">
+		<div id="status">
+			<div class="spinner">
+			</div>
+		</div>
+	</div>
+<div class="mdui-toolbar">
+  <a id="toggle" class="mdui-btn mdui-btn-icon "><i class="mdui-icon material-icons">menu</i></a>
+  <span class="mdui-typo-title"><div align="center">
+  {% block top %}中学生综合素质评定系统{% endblock %}
+  </div></span>
   <div class="mdui-toolbar-spacer"></div>
-</div>
-  <div class="mdui-drawer mdui-color-deep-purple-a100" id="drawer" >
-    <ul class="mdui-list">
-      <div align="center"><li><div class="mdui-typo-headline">综合素质评定</div></li></div>
-  <li class="mdui-subheader" >人脸库</li>
-  <a href="/register/"><li class="mdui-list-item mdui-ripple"><i class="mdui-icon material-icons">tag_faces</i>注册人脸</li></a>
-  <a href="/face_view/"> <li class="mdui-list-item mdui-ripple"><i class="mdui-icon material-icons">data_usage</i>查看人脸库</li></a>
-  <li class="mdui-subheader">签到</li>
-  <a href="/check_add_photo/"><li class="mdui-list-item mdui-ripple"><i class="mdui-icon material-icons">file_upload</i>上传图片</li></a>
-  <a href="/check_result/"><li class="mdui-list-item mdui-ripple"><i class="mdui-icon material-icons">assessment</i>查询数据</li></a>
-  <li class="mdui-subheader">作业表格</li>
-  <a href="/homework_add_photo/"> <li class="mdui-list-item mdui-ripple"><i class="mdui-icon material-icons">file_upload</i>上传图片</li></a>
-  <a href="/homework_result/"> <li class="mdui-list-item mdui-ripple"><i class="mdui-icon material-icons">assessment</i>查询数据</li></a>
-  <li class="mdui-subheader">课堂拍照</li>
-  <a href="/class_add_photo/"> <li class="mdui-list-item mdui-ripple"><i class="mdui-icon material-icons">file_upload</i>上传图片</li></a>
-  <a href="/class_result/"> <li class="mdui-list-item mdui-ripple"><i class="mdui-icon material-icons">assessment</i>查询数据</li></a>
-  <li class="mdui-subheader">其他</li>
-  <a href="/search/"><li class="mdui-list-item mdui-ripple"><i class="mdui-icon material-icons">search</i>搜索</li></a>
-  <a href="/console/"> <li class="mdui-list-item mdui-ripple"><i class="mdui-icon material-icons">dashboard</i>控制台</li></a>
-  <a href='/'><li class="mdui-list-item mdui-ripple"><i class="mdui-icon material-icons">home</i>主页</li></a>
-    </ul>
+	  <a href="/search/" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>
+	  <a href="" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">refresh</i></a>
+  </div>
+  <div class="mdui-drawer mdui-color-grey-300" id="drawer">
+  <ul class="mdui-list" mdui-collapse="{accordion: false}">
+  
+    <li class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons">home</i>
+      <div class="mdui-list-item-content"><a href="/">主页</a></div>
+    </li>
+  
+    <li class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons">dashboard</i>
+      <div class="mdui-list-item-content"><a href="/console/">学生综合评价</a></div>
+    </li>
+  
+    <li class="mdui-collapse-item mdui-collapse-item-open">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons">people</i>
+        <div class="mdui-list-item-content ">日常行为管理</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <ul class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        <a href="/check_add_photo/"><li class="mdui-list-item mdui-ripple">口罩识别-上传数据</li></a>
+        <a href="/check_result/"><li class="mdui-list-item mdui-ripple">口罩识别-查询</li></a>
+        <a href="/class_add_photo/"><li class="mdui-list-item mdui-ripple">课堂纪律-上传数据</li></a>
+        <a href="/class_result/"><li class="mdui-list-item mdui-ripple">课堂纪律-查询</li></a>
+      </ul>
+    </li>
+  
+    <li class="mdui-collapse-item mdui-collapse-item-open">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons">device_hub</i>
+        <div class="mdui-list-item-content">学习情况管理</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <ul class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        <a href="/homework_add_photo/"><li class="mdui-list-item mdui-ripple">作业管理-作业表格识别</li></a>
+        <a href="/homework_result/"><li class="mdui-list-item mdui-ripple">作业管理-作业查询</li></a>
+      </ul>
+    </li>
+
+	<li class="mdui-collapse-item mdui-collapse-item-open">
+	  <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+	    <i class="mdui-list-item-icon mdui-icon material-icons">account_box</i>
+	    <div class="mdui-list-item-content">学生综合管理</div>
+	    <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+	  </div>
+	  <ul class="mdui-collapse-item-body mdui-list mdui-list-dense">
+	    <a href="/register/"><li class="mdui-list-item mdui-ripple">注册新学生</li></a>
+	    <a href="/face_view/"><li class="mdui-list-item mdui-ripple">学生数据库管理</li></a>
+		<a href="/search/"><li class="mdui-list-item mdui-ripple">学生综合评价-搜索学生</li></a>
+	  </ul>
+	</li>
+  </ul>
   </div>
   <div class="mdui-fab-wrapper" id="Fab" mdui-fab="{trigger: 'click'}">
     <button class="mdui-fab mdui-ripple">
@@ -85,13 +128,12 @@
       <button class="mdui-fab mdui-fab-mini mdui-ripple mdui-color-deep-purple-accent"><a class='mdui-color-black' href='/'><i class="mdui-icon material-icons">home</i></a></button>
     </div>
   </div>
+	<div id="hide">
+		{% block hide %}{% endblock %}
+	</div>
     <div id="content">
 	{% block content %}{% endblock %}
 	</div>
-	<footer class="footer">
-		<p>Created using Bootstrap & MDUI, by Xchkoo.</p>
-		<p>&copy; copyright 2021 Xchkoo All rights reserved.</p>
-	</footer>
 {% block script %}
 <script src="/static/jquery/jquery-3.4.1.js"></script>
 <script src="/static/js/jquery.form.min.js"></script>
@@ -101,6 +143,7 @@
 <script src="/static/assets/js/waves.js"></script>
 <script src="/static/assets/js/modernizr.min.js"></script>
 <script src="/static/assets/js/metisMenu.min.js"></script>
+<script src="/static/js/app.js"></script>
 <script>
   var inst = new mdui.Drawer('#drawer');
   document.getElementById('toggle').addEventListener('click', function () {
@@ -119,8 +162,6 @@ drawer.addEventListener('close.mdui.drawer', function () {
 drawer.addEventListener('closed.mdui.drawer', function () {
   console.log('closed');
 });
-</script>
-<script>
 	function ua_change(){
 	var customUserAgent = 'UCWEB/2.0 (MIDP-2.0; U; Adr 9.0.0) UCBrowser U2/1.0.0 Gecko/63.0 Firefox/63.0 iPhone/7.1 SearchCraft/2.8.2 baiduboxapp/3.2.5.10 BingWeb/9.1 ALiSearchApp/2.4';    
     Object.defineProperty(navigator, 'userAgent', {

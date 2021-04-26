@@ -1,4 +1,10 @@
 /*
+Template Name: Foxia - Responsive Bootstrap 4 Admin Dashboard
+Author: Themesbrand
+File: Main Css File
+    更多精品模板：http://www.bootstrapmb.com
+*/
+/*
 01. General
 02. Loader
 03. Bootstrap Custom
@@ -1870,6 +1876,8 @@ code {
   background-color: #f9392f;
   border-color: #f9392f;
 }
+
+
 
 .card-header {
   border-bottom: 1px solid rgba(15, 31, 62, 0.05);

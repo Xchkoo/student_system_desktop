@@ -65,12 +65,42 @@ def face_register(path, trans_id):
         f.close()
     request_url = 'https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add' + "?access_token=" + access_token
     params = "{\"image\":\"" + data + "\",\"image_type\":\"BASE64\"," \
-                                      "\"group_id\":\"students\",\"user_id\":\"" + trans_id + "\",\"quality_control\":\"LOW\",\"liveness_control\":\"NORMAL\"} "
+                                      "\"group_id\":\"students\",\"user_id\":\"" + trans_id + \
+             "\",\"quality_control\":\"LOW\",\"liveness_control\":\"NORMAL\"} "
     headers = {'content-type': 'application/json'}
     response = requests.post(request_url, data=params, headers=headers)
     return response.json()['error_msg']
 
 
-if __name__ == "__main__":
-    face_register("../06.jpg", "07")
+def user_delete(trans_id):
+    user_face_token = user_get(trans_id)
+    if user_face_token == -1:
+        return {"msg": "FAIL"}
+    access_token = get_at(ak, sk)
+    request_url = "https://aip.baidubce.com/rest/2.0/face/v3/faceset/face/delete"
+    params = "{\"user_id\":\""+str(trans_id)+"\",\"group_id\":\"students\",\"face_token\":\""+str(user_face_token)+"\"}"
+    request_url = request_url + "?access_token=" + access_token
+    headers = {'content-type': 'application/json'}
+    response = requests.post(request_url, data=params, headers=headers)
+    if response.json()['error_msg'] == 'SUCCESS':
+        return {"msg": "SUCCESS"}
+    else:
+        return {"msg": "FAIL"}
 
+
+def user_get(trans_id):
+    request_url = "https://aip.baidubce.com/rest/2.0/face/v3/faceset/face/getlist"
+    params = "{\"user_id\":\"" + str(trans_id) + "\",\"group_id\":\"students\"}"
+    access_token = get_at(ak, sk)
+    request_url = request_url + "?access_token=" + access_token
+    headers = {'content-type': 'application/json'}
+    response = requests.post(request_url, data=params, headers=headers)
+    if response.json()["error_msg"] == "SUCCESS":
+        return response.json()['result']['face_list'][0]['face_token']
+    else:
+        return -1
+
+
+
+if __name__ == "__main__":
+    print(user_delete(1))

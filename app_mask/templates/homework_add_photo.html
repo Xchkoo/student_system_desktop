@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}上传图片{% endblock %}
-{% block top %}上传图片{% endblock %}
+{% block title %}作业管理-作业表格识别{% endblock %}
+{% block top %}作业管理-作业表格识别{% endblock %}
 {% block head %}
   {{super()}}
 <link href="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
 <link href="/static/assets/css/metismenu.min.css" rel="stylesheet" type="text/css">
 <link href="/static/assets/css/icons.css" rel="stylesheet" type="text/css">
-<link href="/static/assets/css/style.css" rel="stylesheet" type="text/css">
+<link href="/static/css/style.css" rel="stylesheet" type="text/css">
 {% endblock %}
 {% block content %}
     {{ super() }}
@@ -16,11 +16,11 @@
 			<div class="page-title-box">
 				<div class="row align-items-center">
 					<div class="col-md-12">
-						<h4 class="page-title mb-0">上传图片</h4>
+						<h4 class="page-title mb-0">作业管理-作业表格识别</h4>
 						<ol class="breadcrumb m-0">
 							<li class="breadcrumb-item"><a href="/">中学生综合素质评定系统</a></li>
-							<li class="breadcrumb-item"><a href="/homework_add_photo/">作业表格</a></li>
-							<li class="breadcrumb-item"><a href="/homework_add_photo/">上传图片</a></li>
+							<li class="breadcrumb-item"><a href="/homework_add_photo/">作业管理</a></li>
+							<li class="breadcrumb-item"><a href="/homework_add_photo/">作业表格识别</a></li>
 						</ol>
 					</div>
 				</div>
@@ -28,7 +28,7 @@
 		</div>
 	</div>
 		<div class="row">
-			<div class="col-lg-9">
+			<div class="col-sm-12 col-lg-12 col-md-12">
 		<div class="card">
 		<div class="card-body">
 		<h4 class="mt-0 header-title">输入详细信息</h4>
@@ -36,8 +36,20 @@
 	<div class="form-group">
     <div class="row">
 	<div class="m-3">
-	<label class="mdui-textfield-label">学科</label>
-	<input class="mdui-textfield-input" id="subject" name="subject"/>
+	<label for="subject">学科：</label>
+	<select id="subject" name="subject" class="mdui-select" mdui-select="{subject: 'bottom'}">
+	<option value="语文">语文</option>
+	<option value="数学">数学</option>
+	<option value="英语">英语</option>
+	<option value="物理">物理</option>
+	<option value="化学">化学</option>
+	<option value="生物">生物</option>
+	<option value="政治">政治</option>
+	<option value="历史">历史</option>
+	<option value="地理">地理</option>
+	<option value="信息技术">信息技术</option>
+	<option value="通用技术">通用技术</option>
+	</select>
 	</div>
 	<div class="m-3">
 	<label class="mdui-textfield-label">作业名称：</label>
@@ -71,14 +83,23 @@ $(function(){
 			type: "POST",
 			dataType: 'json',
 			clearForm:true,
+			beforeSubmit:function(){
+				load = mdui.snackbar({
+					message: "loading...",
+					timeout: 0,
+					closeOnOutsideClick: false
+				});
+			},
 			success:function(res){
+				load.close();
 				mdui.snackbar({
 					message: res['msg']
 				});
 			},
 			error:function(){
+				load.close();
 				mdui.snackbar({
-					message: 'error!'
+					message: 'ERROR: request timeout!'
 				});
 			}
 		});

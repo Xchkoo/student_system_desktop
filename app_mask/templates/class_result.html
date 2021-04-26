@@ -1,17 +1,81 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <title>class_result</title>
-</head>
-<body>
-
-</body>
-
-<br><br><br><br><br><br>
-<hr>
-<a href="/">--->返回主页</a>
-<hr>
-
-</html>
-
+{% extends "base.html" %}
+{% block title %}课堂纪律-查询{% endblock %}
+{% block top %}课堂纪律-查询{% endblock %}
+{% block head %}
+	{{ super() }}
+	<link href="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+	<link href="/static/assets/css/metismenu.min.css" rel="stylesheet" type="text/css">
+	<link href="/static/assets/css/icons.css" rel="stylesheet" type="text/css">
+<link href="/static/css/style.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="/static/css/morris.css">
+{% endblock %}
+{% block content %}
+{{ super() }}
+<div class='container-fluid'>
+	<div class="row">
+		<div class="col-lg-9">
+			<div class="page-title-box">
+				<div class="row align-items-center">
+					<div class="col-md-12">
+						<h4 class="page-title mb-0">课堂纪律-查询</h4>
+						<ol class="breadcrumb m-0">
+							<li class="breadcrumb-item"><a href="/console/">中学生综合素质评定系统</a></li>
+							<li class="breadcrumb-item"><a href="/homework_add_photo/">课堂纪律</a></li>
+							<li class="breadcrumb-item"><a href="/homework_result/">查询</a></li>
+						</ol>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div mdui-panel id="class_here">
+	</div>
+	<br>
+	<div style="text-align:right"><a href="/class_add_photo/">需要上传数据？点击这里</a></div>
+	<br>
+</div>
+{% endblock %}
+{% block footer%}
+{% endblock %}
+{% block script %}
+{{ super() }}
+<script src="/static/js/jquery.peity.min.js"></script>
+<script src="/static/js/morris.min.js"></script>
+<script src="/static/js/raphael-min.js"></script>
+<script>
+	$(function(){
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			contentType:"application/json",
+			url: "/class_result/",
+			success:function(data){
+				for(var i=0;i<data["num"];i++){
+					var text = '\
+					<div class="row">\
+						<div class="col-12">\
+							<div class="card">\
+								<div class="card-body">\
+									<div class="mdui-chip">\
+									  <span class="mdui-chip-icon"><i class="mdui-icon material-icons">face</i></span>\
+									  <span class="mdui-chip-title">'+data["info"][i]["name"]+'</span>\
+									</div>\
+									<a class="mdui-btn mdui-btn-dense mdui-ripple" href="/download/'+data["info"][i]["img"]+'" download="/download/'+data["info"][i]["img"]+'">图片下载</a>\
+									<h5>时间：'+data["info"][i]["time"]+' 课程： '+data["info"][i]["lesson"]+' 理由：'+data["info"][i]["reason"]+' </h5>\
+								</div>\
+							</div>\
+						</div>\
+					</div>\
+					';
+					$("#class_here").append(text);
+				}
+			},
+			error:function(){
+				mdui.snackbar({
+				message: 'ERROR: run time error! check your network! '
+				});
+			}
+		});
+	});
+</script>
+{% endblock%}

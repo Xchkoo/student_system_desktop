@@ -1,55 +1,160 @@
 {% extends "base.html" %}
-{% block title %}查看人脸库{% endblock %}
-{% block top %}查看人脸库{% endblock %}
+{% block title %}学生数据库管理{% endblock %}
+{% block top %}学生数据库管理{% endblock %}
 {% block head %}
-  {{super()}}
-  <link href="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
-  <link href="/static/assets/css/metismenu.min.css" rel="stylesheet" type="text/css">
-  <link href="/static/assets/css/icons.css" rel="stylesheet" type="text/css">
-  <link href="/static/assets/css/style.css" rel="stylesheet" type="text/css">
+	{{super()}}
+	<link href="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+	<link href="/static/assets/css/metismenu.min.css" rel="stylesheet" type="text/css">
+	<link href="/static/assets/css/icons.css" rel="stylesheet" type="text/css">
+<link href="/static/css/style.css" rel="stylesheet" type="text/css">
+{% endblock %}
+{% block hide %}
+<div class="modal fade bs-warning-modal-center" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title mt-0 ">没有人脸数据!</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			</div>
+			<div class="modal-body">
+				<p>
+					没有人脸数据。
+				</p>
+				<p class="mb-0">
+					是否去添加人脸?
+				</p>
+			</div
+			<div class="modal-footer">
+				<button class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-grey-200" data-dismiss="modal">取消</button>
+				<button class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-green-500" onclick="window.location.href = '/register/'">是</button>
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}
 {% block content %}
     {{ super() }}
-	<div class='container-fluid' id='insert'>
+	<div class='container-fluid'>
 		<div class="row">
 				<div class="col-lg-9">
 					<div class="page-title-box">
 						<div class="row align-items-center">
 							<div class="col-md-12">
-								<h4 class="page-title mb-0">人脸库管理</h4>
+								<h4 class="page-title mb-0">学生数据库管理</h4>
 								<ol class="breadcrumb m-0">
-									<li class="breadcrumb-item"><a href="/console/">控制台</a></li>
-									<li class="breadcrumb-item"><a href="/face_view/">人脸库</a></li>
-									<li class="breadcrumb-item"><a href="/face_view/">人脸库管理</a></li>
+									<li class="breadcrumb-item"><a href="/console/">中学生综合素质评定系统</a></li>
+									<li class="breadcrumb-item"><a href="/face_view/">学生综合管理</a></li>
+									<li class="breadcrumb-item"><a href="/face_view/">学生数据库管理</a></li>
 								</ol>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-	<div id='main'></div>
+		<div id="search">
+			
+		</div>
+		<div id='stu_row' class='row'></div>
+	</div>
+{% endblock %}
+{% block footer%}
 {% endblock %}
 {% block script %}
 {{ super() }}
 <script src="/static/assets/pages/form-advanced.js"></script>
 <script src="/static/assets/plugins/bootstrap-filestyle/js/bootstrap-filestyle.min.js"></script>
 <script>
-$(document).ready(function(){
-	$.ajax({
-		type: "POST",
-		dataType: "json",
-		url: "/database/api_get_data/face_view/",
-		success:function(data){
-			for(var i=1;i<=data['num'];i++)
-			$("#main").append(" <div class=\"row\" id='row" +i+ "'><div class=\"col-md-6 col-xl-3\"><div class=\"card\"><div class=\"card-body\"><h4 class=\"card-title font-20 mt-0\">"+ data['info'][i]['name'] +"</h4><h6 class=\"card-subtitle text-muted\">Support card subtitle</h6></div><img class=\"img-fluid\" src=\"assets/images/small/img-4.jpg\" alt=\"Card image cap\"><div class=\"card-body\"><p class=\"card-text\">Some quick example text to build on the card title and makeup the bulk of the card's content.</p><a href=\"\" class=\"card-link\">Card link</a><a href=\"\" class=\"card-link\">Another link</a></div></div></div>");
+	$(function(){
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "/api/get_data/face_view/",
+			success:function(data){
+				if(data.num == 0){
+					$(".bs-warning-modal-center").modal('show');
+					return ;}
+				for(var i=0;i<data.num;i++){
+					var stu='\
+					<div class="col-md-6 col-xl-3">\
+					<div class="card">\
+					<img class="card-img-top img-fluid" src=/api/get_pic/'+data.info[i].path+' alt='+data.info[i].name+'>\
+					<div class="card-body">\
+						<h4 class="card-title font-20 mt-0">'+data.info[i].name+'</h4>\
+						<p class="card-text">暂无详细信息</p>\
+					</div>\
+					<div class="card-body">\
+						<button data-toggle="modal" data-target=".bs-example-modal-center" class="mdui-btn mdui-btn-dense mdui-color-red-500 mdui-ripple">删除</button>\
+						<a class="mdui-btn mdui-btn-dense mdui-color-blue-200 mdui-ripple" href="/download/'+data.info[i].path+'" download="/download/'+data.info[i].path+'">保存人脸到本地</a>\
+					</div>\
+					</div>\
+					</div>\
+					<div class="modal fade bs-example-modal-center" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">\
+						<div class="modal-dialog modal-dialog-centered">\
+							<div class="modal-content">\
+								<div class="modal-header">\
+									<h5 class="modal-title mt-0 mdui-text-color-red">确认要删除吗？</h5>\
+									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>\
+								</div>\
+								<div class="modal-body">\
+									<p>\
+										1. 你可以在删除数据后重新导入数据，但不会关联到以前的有关数据。\
+									</p>\
+									<p>\
+										2. 已存在的与此数据关联的数据不会被删除。\
+									</p>\
+									<p class="mb-0 mdui-text-color-red">\
+										WARNING: 确认删除吗?\
+									</p>\
+								</div>\
+								<div class="modal-footer">\
+									<button class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-grey" data-dismiss="modal">取消</button>\
+									<button class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-red-500" onclick="delete_user(\''+data.info[i].name+'\');close_modal()">确定</button>\
+								</div>\
+							</div>\
+						</div>\
+					</div>';
+					$("#stu_row").append(stu);
+				}
+			},
+			error:function(){
+				mdui.snackbar({
+				message: 'ERROR: run time error! check your network!'
+				});
 			}
-			data['info']['path']
-		error:function(){
-			mdui.snackbar({
-			message: '数据提交失败'
-			});
-		},
-	})
-	})
+		});
+	});
+	
+	function close_modal(){
+		$(".bs-example-modal-center").modal('hide');
+		window.location.reload();
+	}
+	function delete_user(name){
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			contentType: "application/json",
+			data: JSON.stringify({
+				"name": name
+			}),
+			url: "/api/delete/student_by_name/",
+			beforeSubmit:function(){
+				load = mdui.snackbar({
+					message: "loading...",
+					timeout: 0,
+					closeOnOutsideClick: false
+				});
+			},
+			success:function(data){
+				mdui.snackbar({
+				message: data["msg"]
+				});
+			},
+			error:function(){
+				mdui.snackbar({
+				message: 'ERROR: run time error! check your network! '
+				});
+			}
+		});
+	};
 </script>
-{% endblock%}[]
+{% endblock %}

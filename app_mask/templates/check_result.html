@@ -1,17 +1,355 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Result</title>
-</head>
-<img>
-<img src={{ URL }} ></img>
-<a></a>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}口罩识别-查询{% endblock %}
+{% block top %}口罩识别-查询{% endblock %}
+{% block head %}
+	{{ super() }}
+	<link href="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+	<link href="/static/assets/css/metismenu.min.css" rel="stylesheet" type="text/css">
+	<link href="/static/assets/css/icons.css" rel="stylesheet" type="text/css">
+	<link href="/static/css/style.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="/static/css/morris.css">
+{% endblock %}
+{% block content %}
+{{ super() }}
+<div class='container-fluid'>
+	<div class="row">
+		<div class="col-lg-9">
+			<div class="page-title-box">
+				<div class="row align-items-center">
+					<div class="col-md-12">
+						<h4 class="page-title mb-0">口罩识别-查询</h4>
+						<ol class="breadcrumb m-0">
+							<li class="breadcrumb-item"><a href="/console/">中学生综合素质评定系统</a></li>
+							<li class="breadcrumb-item"><a href="/check_add_photo/">口罩识别</a></li>
+							<li class="breadcrumb-item"><a href="/check_result">查询</a></li>
+						</ol>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xl-12 col-md-12">
+		    <div class="card mini-stats">
+		        <div class="p-3 mini-stats-content">
+		            <div class="mb-4">
+		                <div class="float-right text-right">
+		                    <p class="text-white-50 ">总计 - total</p>
+		                </div>
+		            </div>
+		        </div>
+		        <div class="ml-3 mr-3">
+		            <div class="bg-white p-3 mini-stats-desc rounded">
+		                <h5 class="float-right mt-0 all-pass-num"></h5>
+		                <h6 class="mt-0 mb-3">人次</h6>
+		                <p class="text-muted mb-0">系统检测总计人次</p>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+	</div>
+	<div class="row">
+	    <div class="col-xl-3 col-md-6">
+	        <div class="card mini-stats">
+	            <div class="p-3 mini-stats-content">
+	                <div class="mb-4">
+	                    <div class="float-right text-right">
+	                        <p class="text-white-50 pass-row-time"></p>
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="ml-3 mr-3">
+	                <div class="bg-white p-3 mini-stats-desc rounded">
+	                    <h5 class="float-right mt-0" id="school-door-pass-num"></h5>
+	                    <h6 class="mt-0 mb-3">人次</h6>
+	                    <p class="text-muted mb-0">校园门口经过人次</p>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="col-xl-3 col-md-6">
+	        <div class="card mini-stats">
+	            <div class="p-3 mini-stats-content">
+	                <div class="mb-4">
+	                    <div class="float-right text-right">
+	                        <p class="text-white-50 pass-row-time"></p>
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="ml-3 mr-3">
+	                <div class="bg-white p-3 mini-stats-desc rounded">
+	                    <h5 class="float-right mt-0" id="computer-room-pass-num"></h5>
+	                    <h6 class="mt-0 mb-3" >人次</h6>
+	                    <p class="text-muted mb-0">机房门口经过人次</p>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="col-xl-3 col-md-6">
+	        <div class="card mini-stats">
+	            <div class="p-3 mini-stats-content">
+	                <div class="mb-4">
+	                    <div class="float-right text-right">
+	                        <p class="text-white-50 pass-row-time"></p>
+	                    </div>
+					</div>
+	            </div>
+	            <div class="ml-3 mr-3">
+	                <div class="bg-white p-3 mini-stats-desc rounded">
+	                    <h5 class="float-right mt-0" id="restaurant-pass-num"></h5>
+	                    <h6 class="mt-0 mb-3">人次</h6>
+	                    <p class="text-muted mb-0">食堂门口经过人次</p>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="col-xl-3 col-md-6">
+	        <div class="card mini-stats">
+	            <div class="p-3 mini-stats-content">
+	                <div class="mb-4">
+	                    <div class="float-right text-right">
+	                        <p class="text-white-50 pass-row-time"></p>
+	                    </div>
+					</div>
+	            </div>
+	            <div class="ml-3 mr-3">
+	                <div class="bg-white p-3 mini-stats-desc rounded">
+	                    <h5 class="float-right mt-0" id="class-door-pass-num"></h5>
+	                    <h6 class="mt-0 mb-3">人次</h6>
+	                    <p class="text-muted mb-0">教室门口经过人次</p>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	<div class="row">
+		<div class="col-lg-3">
+			<div class="card">
+				<div class="card-body">
+					<h5 class="mt-0 header-title mb-5">通勤人数</h4>
+					<div id="morris-bar-commuting" class="morris-chart-height morris-charts"></div>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3">
+		    <div class="card">
+		        <div class="card-body">
+					<h5 class="mt-0 header-title mb-5">系统已检验人数</h4>
+					<div id="morris-bar-system-checkout" class="morris-chart-height morris-charts"></div>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-6">
+		    <div class="card">
+		        <div class="card-body" >
+					<h5 class="mb-0">近日佩戴口罩统计<h5>
+					<div id="morris-line-mask-wearing" class="morris-chart-height morris-charts"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-6">
+		    <div class="card">
+		        <div class="card-body">
+					<h5 class="mb-0">系统安全<h5>
+					<ul class="list-inline widget-chart m-t-20 m-b-15 text-center">
+						<li class="list-inline-item">
+							<h4 class="text-muted font-14">系统安全</h4>
+							<h5 class="mb-0 mdui-text-color-green-500">良好</h5>
+						</li>
+					</ul>
+					<div id="morris-area-system-judge" class="morris-chart-height morris-charts"></div>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-6">
+			<div class="card">
+				<div class="card-body">
+					<div id="morris-donut-total" class="morris-chart-height morris-charts"></div>
+				</div>
+			</div>
+			<br>
+			<div class="card">
+				<div class="card-body">
+					<form id="search-form" method=post enctype=multipart/form-data>
+						<input type="date" name="date" id="date">
+						<i id="submitbtn" class="mdui-icon material-icons mdui-ripple">search</i>
+					</form>
+				</div>
+				<div class="card" id="search_insert"></div>
+			</div>
+		</div>
+	</div>
+		<div class="col-lg-12">
+			
+		</div>
+</div>
+{% endblock %}
+{% block footer%}
+{% endblock %}
+{% block script %}
+{{ super() }}
+<script src="/static/js/jquery.peity.min.js"></script>
+<script src="/static/js/morris.min.js"></script>
+<script src="/static/js/raphael-min.js"></script>
+<script src="/static/assets/pages/form-advanced.js"></script>
+<script src="/static/assets/plugins/bootstrap-filestyle/js/bootstrap-filestyle.min.js"></script>
+<script>
+	$(function(){
+		pad=function(e,t,n){n=n||"0",t=t||2;while((""+e).length<t)e=n+e;return e}
+		c = new Date()
+		date=c.getFullYear()+"-"+pad(c.getMonth()+1)+"-"+pad(c.getDate());
+		$(".pass-row-time").append(date);
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			contentType:"application/json",
+			data: JSON.stringify({
+				"date": date
+			}),
+			url: "/api/get_data/check_result/",
+			success:function(data){
+				$("#class-door-pass-num").append(data.pass_row_data.clnum);
+				$("#restaurant-pass-num").append(data.pass_row_data.rnum);
+				$("#school-door-pass-num").append(data.pass_row_data.snum);
+				$("#computer-room-pass-num").append(data.pass_row_data.cnum);
+				$(".all-pass-num").append(data['donut_chart']['all']);
+				!function morrischart($) {
+					"use strict";
+					var MorrisCharts = function () {
+					};
+						//creates line chart
+						MorrisCharts.prototype.createLineChart = function (element, data, xkey, ykeys, labels, lineColors) {
+							Morris.Line({
+								element: element,
+								data: data,
+								xkey: xkey,
+								ykeys: ykeys,
+								labels: labels,
+								xLabels: "day",
+								hideHover: 'auto',
+								gridLineColor: '#eef0f2',
+								resize: true, //defaulted to true
+								lineColors: lineColors,
+								lineWidth: 2,
+								parseTime: false
+							});
+						},
+				
+						//creates Bar chart
+						MorrisCharts.prototype.createBarChart = function (element, data, xkey, ykeys, labels, lineColors) {
+							Morris.Bar({
+								element: element,
+								data: data,
+								xkey: xkey,
+								ykeys: ykeys,
+								labels: labels,
+								gridLineColor: '#eef0f2',
+								barSizeRatio: 0.4,
+								resize: true,
+								hideHover: 'auto',
+								barColors: lineColors
+							});
+						},
+				
+						//creates area chart
+						MorrisCharts.prototype.createAreaChart = function (element, data, xkey, ykeys, labels, lineColors) {
+							Morris.Area({
+								element: element,
+								pointSize: 0,
+								lineWidth: 0,
+								data: data,
+								xkey: xkey,
+								ykeys: ykeys,
+								xLabels: "day",
+								labels: labels,
+								resize: true,
+								gridLineColor: '#eee',
+								hideHover: 'auto',
+								lineColors: lineColors,
+								fillOpacity: .6,
+								behaveLikeLine: true
+							});
+						},
+				
+						//creates Donut chart
+						MorrisCharts.prototype.createDonutChart = function (element, data, colors) {
+							Morris.Donut({
+								element: element,
+								data: data,
+								resize: true,
+								colors: colors
+							});
+						},
+						//creates Stacked chart
+						MorrisCharts.prototype.createStackedChart = function (element, data, xkey, ykeys, labels, lineColors) {
+							Morris.Bar({
+								element: element,
+								data: data,
+								xkey: xkey,
+								ykeys: ykeys,
+								stacked: true,
+								labels: labels,
+								hideHover: 'auto',
+								barSizeRatio: 0.4,
+								resize: true, //defaulted to true
+								gridLineColor: '#eeeeee',
+								barColors: lineColors
+							});
+						},
+						MorrisCharts.prototype.init = function () {
+							//create line chart
+							var $data = data['mask_wearing_chart_data'];
+							this.createLineChart('morris-line-mask-wearing', $data, 'date', ['unwear', 'wear'], ['佩戴口罩人数', '未佩戴口罩人数'], ['#05cc16', '#e61e04']);
+				
+							//creating bar chart
+							var $barData = data["commuting_chart_data"];
+							this.createBarChart('morris-bar-commuting', $barData, 'date', ['all'], ['通勤人数'], ['#1699dd']);
+							this.createBarChart('morris-bar-system-checkout', $barData, 'date', ['all'], ['系统已检验人数'], ['#15dd0a']);
+							//creating morris-area-system-judge chart
+							var $areaData = data['system_judge'];
+							this.createAreaChart('morris-area-system-judge', $areaData, 'date', ['score'], ['系统智能判断安全系数'], ['#afddac']);
+							//creating donut chart
+							var $donutData = [
+								{label: "佩戴口罩总计人数", value: data['donut_chart']['unwear']},
+								{label: "未佩戴口罩总计人数", value: data['donut_chart']['wear']},
+							];
+							this.createDonutChart('morris-donut-total', $donutData, ['#655be6', '#1699dd']);
+				
+							//creating Stacked chart
+							var $stckedData = [
+								{y: '2005', a: 45, b: 180},
+								{y: '2006', a: 75, b: 65},
+								{y: '2007', a: 100, b: 90},
+								{y: '2008', a: 75, b: 65},
+								{y: '2009', a: 100, b: 90},
+								{y: '2010', a: 75, b: 65},
+								{y: '2011', a: 50, b: 40},
+								{y: '2012', a: 75, b: 65},
+								{y: '2013', a: 50, b: 40},
+								{y: '2014', a: 75, b: 65},
+								{y: '2015', a: 100, b: 90},
+								{y: '2016', a: 80, b: 65}
+							];
+							this.createStackedChart('morris-bar-stacked', $stckedData, 'y', ['a', 'b'], ['Series A', 'Series B'], ['#655be6', '#f0f1f4']);
+						},
+						//init
+						$.MorrisCharts = new MorrisCharts, $.MorrisCharts.Constructor = MorrisCharts
+				}(window.jQuery),
 
-
-<br><br><br><br><br><br>
-<hr>
-<a href="/">--->返回主页</a>
-<hr>
+				//initializing 
+					function ($) {
+						"use strict";
+						$.MorrisCharts.init();
+					}(window.jQuery);
+			},
+			error:function(){
+				mdui.snackbar({
+				message: 'ERROR: run time error! check your network! '
+				});
+			}
+		});
+	});
+</script>
+{% endblock%}

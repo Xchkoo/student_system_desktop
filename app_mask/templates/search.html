@@ -1,28 +1,117 @@
 {% extends "base.html" %}
+{% block title %}学生综合评价-搜索学生{% endblock %}
+{% block top %}学生综合评价-搜索学生{% endblock %}
 {% block head %}
-{{ super() }}
+{{ super ()}}
 <link href="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
 <link href="/static/assets/css/metismenu.min.css" rel="stylesheet" type="text/css">
 <link href="/static/assets/css/icons.css" rel="stylesheet" type="text/css">
-<link href="/static/assets/css/style.css" rel="stylesheet" type="text/css">
+<link href="/static/css/style.css" rel="stylesheet" type="text/css">
 {% endblock %}
-{% block title %}搜索 - search{% endblock %}
-{% block top %}搜索 - search{% endblock %}
 {% block content %}
-{{ super() }}
-<div class='container-fluid'>
-<div class="row">
-		<div class="col-lg-9">
+    {{ super() }}
+	<div class='container-fluid'>
+	<div class="row">
+		<div class="col-sm-12 col-lg-12 col-md-12">
 			<div class="page-title-box">
 				<div class="row align-items-center">
 					<div class="col-md-12">
-						<h4 class="page-title mb-0">搜索</h4>
+						<h4 class="page-title mb-0">搜索学生</h4>
 						<ol class="breadcrumb m-0">
-							<li class="breadcrumb-item"><a href="/">中学生综合素质评定系统</a></li>	
-							<li class="breadcrumb-item"><a href="/search/">搜索</a></li>
+							<li class="breadcrumb-item"><a href="/">中学生综合素质评定系统</a></li>
+							<li class="breadcrumb-item"><a href="/search/">学生综合评价</a></li>
+							<li class="breadcrumb-item"><a href="/search/">搜索学生</a></li>
 						</ol>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+	<div class="row">
+		<div class="col-sm-12 col-lg-12 col-md-12">
+		<div class="card">
+			<div class="card-body">
+					<form method=post enctype=multipart/form-data action="/search/" id="form">
+						<div class="form-group">
+						<div class="row">
+							<div class="col-11">
+							<label class="mdui-textfield-label">名字：</label>
+							<input class="mdui-textfield-input" id="name" name="name"/>
+							</div>
+							<button class="mdui-btn mt-4" id="submitbtn">搜索</button>
+						</div>
+					</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+{% block script %}
+{{ super() }}
+<script src="/static/assets/pages/form-advanced.js"></script>
+<script src="/static/assets/plugins/bootstrap-filestyle/js/bootstrap-filestyle.min.js"></script>
+<script>
+$(function(){
+	$("#submitbtn").click(function(){
+		$("#add_form").ajaxForm({
+			url: "/search/",
+			type: "POST",
+			dataType: 'json',
+			clearForm:true,
+			beforeSubmit:function(){
+				load = mdui.snackbar({
+					message: "loading...",
+					timeout: 0,
+					closeOnOutsideClick: false
+				});
+			},
+			success:function(data){
+				load.close();
+				mdui.snackbar({
+					message: data['msg']
+				});
+				
+			},
+			error:function(){
+				load.close();
+				mdui.snackbar({
+					message: 'ERROR:run time error!'
+				});
+			}
+		});
+	});
+});
+</script>
+{% endblock%}
+
+<div class="row">
+	<div class="col-3">
+		<div class="card">
+			<img class="card-img-top img-fluid" src="/api/get_pic/'+data.info.path" alt="data.info.name">
+		<div class="card-body">
+			<h5>data.info.name</h5>
+		</div>
+		</div>
+	</div>
+	<div class="col-9">
+		<div class="card">
+			<h5> 详细 </h5>
+			<div class="card-body">
+				<div class="card">
+					data.check
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="card">
+					data.class
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="card">
+					data.homework
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

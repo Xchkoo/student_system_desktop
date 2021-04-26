@@ -1,15 +1,276 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>homework_result</title>
-</head>
-<body>
-
-</body>
-
-<br><br><br><br><br><br>
-<hr>
-<a href="/">--->返回主页</a>
-<hr>
-</html>
+{% extends "base.html" %}
+{% block title %}作业管理-作业查询{% endblock %}
+{% block top %}作业管理-作业查询{% endblock %}
+{% block head %}
+	{{ super() }}
+	<link href="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+	<link href="/static/assets/css/metismenu.min.css" rel="stylesheet" type="text/css">
+	<link href="/static/assets/css/icons.css" rel="stylesheet" type="text/css">
+<link href="/static/css/style.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="/static/css/morris.css">
+{% endblock %}
+{% block content %}
+{{ super() }}
+<div class='container-fluid'>
+	<div class="row">
+		<div class="col-lg-9">
+			<div class="page-title-box">
+				<div class="row align-items-center">
+					<div class="col-md-12">
+						<h4 class="page-title mb-0">作业管理-作业查询</h4>
+						<ol class="breadcrumb m-0">
+							<li class="breadcrumb-item"><a href="/console/">中学生综合素质评定系统</a></li>
+							<li class="breadcrumb-item"><a href="/homework_add_photo/">作业管理</a></li>
+							<li class="breadcrumb-item"><a href="/homework_result/">作业查询</a></li>
+						</ol>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="mdui-panel " mdui-panel id="put_here">
+	</div>
+	<br>
+	<div style="text-align:right"><a href="/homework_add_photo/">需要添加作业？点击这里</a></div>
+	<br>
+</div>
+{% endblock %}
+{% block footer%}
+{% endblock %}
+{% block script %}
+{{ super() }}
+<script src="/static/js/jquery.peity.min.js"></script>
+<script src="/static/js/morris.min.js"></script>
+<script src="/static/js/raphael-min.js"></script>
+<script>
+	function update(name,homework,subject){
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			contentType: "application/json charset=utf-8",
+			data: JSON.stringify( {name: name,homework: homework,subject: subject}),
+			url: "/api/update_homework/",
+			success: function(data){
+				window.location.reload();
+			},
+			error: function(){
+				mdui.snackbar({
+				message: 'ERROR: run time error! check your network! '
+				});
+			}
+		})
+	}
+</script>
+<script>
+	$(function(){
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			contentType:"application/json",
+			url: "/homework_result/",
+			success:function(data){
+				var subject = new Array("语文","数学","英语","物理","化学","生物","政治","历史","地理","信息技术","通用技术");
+				var subject_english = new Array("chinese","math","english","physics","chemistry","biology","politics","history","geography","it","gt");
+				for(var i=0;i<11;i++){
+					var panel = '\
+						<div class="mdui-panel-item mdui-panel-item-open" id="'+subject[i]+'">\
+							<div class="mdui-panel-item-header">'+subject[i]+'</div>\
+							<div class="mdui-panel-item-body" id="homework_here">\
+								<hr>\
+							</div>\
+						</div>\
+					</div>\
+					';
+					$("#put_here").append(panel);
+				}
+				//分科目
+				for(i in data){
+					//分作业
+					// alert(i);
+					for(var j=0;j<data[i]["num"];j++){
+						var homework = '\
+						<div class="row id="'+data[i]["info"][j]["homework_name"]+'">\
+							<div class="col-xs-5 col-md-3 col-lg-3">\
+								<div class="card">\
+									<div class="card-body">\
+										<h4 class="card-title font-20 mt-0">'+data[i]["info"][j]["homework_name"]+'</h4>\
+										<h7>'+data[i]["info"][j]["homework_time"]+'</h7>\
+										<hr>\
+										<div id="morris-sum-'+i+'-'+data[i]["info"][j]["homework_name"]+'-chart" class="morris-chart-height morris-charts"></div>\
+									</div>\
+								</div>\
+							</div>\
+							<div class="col-xs-7 col-md-9 col-lg-9">\
+								<div class="card">\
+									<div class="card-body">\
+										<div class="row">\
+											<div class="col-5">\
+												<h5>提交人数</h5>\
+												<div id="morris-'+i+'-'+data[i]["info"][j]["homework_name"]+'-handin" class="morris-chart-height morris-charts"></div>\
+											</div>\
+											<div class="col-7">\
+											<h5>提交学生</h5>\
+											<div id="'+i+'-'+data[i]["info"][j]["homework_name"]+'-handin-here"></div>\
+											</div>\
+											<div class="col-5">\
+											<h5>未提交人数</h5>\
+											<div id="morris-'+i+'-'+data[i]["info"][j]["homework_name"]+'-unhandin" class="morris-chart-height morris-charts"></div>\
+											</div>\
+											<div class="col-7">\
+											<h5>未提交学生</h5>\
+											<div id="'+i+'-'+data[i]["info"][j]["homework_name"]+'-unhandin-here"></div>\
+											</div>\
+										</div>\
+									</div>\
+								</div>\
+							</div>\
+						</div>\
+						';
+						$("#"+i).find("#homework_here").append(homework);
+						
+						//person_data
+						for(var o=0;o<data[i]["info"][j]["hand_in_num"];o++){
+							$("#"+i+'-'+data[i]["info"][j]["homework_name"]+'-handin-here').append('\
+								<div class="mdui-chip">\
+								  <span class="mdui-chip-icon"><i class="mdui-icon material-icons">face</i></span>\
+								  <span class="mdui-chip-title"><a herf="/stu/'+data[i]["info"][j]["hand_in_name"][o]+'">'+data[i]["info"][j]["hand_in_name"][o]+'</a></span>\
+								</div>\
+							')
+						}
+						for(var o=0;o<data[i]["info"][j]["un_hand_in_num"];o++){
+							$("#"+i+'-'+data[i]["info"][j]["homework_name"]+'-unhandin-here').append('\
+								<div class="mdui-chip">\
+								  <span class="mdui-chip-icon"><i class="mdui-icon material-icons">face</i></span>\
+								  <span class="mdui-chip-title"><a data-toggle="modal" data-target=".bs-'+i+'-'+data[i]["info"][j]["homework_name"]+'-'+data[i]["info"][j]["un_hand_in_name"][o]+'-modal-center">'+data[i]["info"][j]["un_hand_in_name"][o]+'</a></span>\
+								</div>\
+								<div class="modal fade bs-'+i+'-'+data[i]["info"][j]["homework_name"]+'-'+data[i]["info"][j]["un_hand_in_name"][o]+'-modal-center" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">\
+									<div class="modal-dialog modal-dialog-centered">\
+										<div class="modal-content">\
+											<div class="modal-header">\
+												<h5 class="modal-title mt-0 mdui-text-color-red">要更改'+data[i]["info"][j]["un_hand_in_name"][o]+'为提交吗</h5>\
+												<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>\
+											</div>\
+											<div class="modal-body">\
+												<p>\
+													你可以在设置'+data[i]["info"][j]["un_hand_in_name"][o]+'为提交状态，但无法再设回，请注意！\
+												</p>\
+												<p class="mb-0 mdui-text-color-red">\
+													WARNING: 确认更改'+data[i]["info"][j]["un_hand_in_name"][o]+'为提交状态吗?\
+												</p>\
+											</div>\
+											<div class="modal-footer">\
+												<button class="mdui-btn mdui-btn-raised mdui-ripple" data-dismiss="modal">取消</button>\
+												<button class="mdui-btn mdui-btn-raised mdui-ripple" onclick="update(name=\''+data[i]["info"][j]["un_hand_in_name"][o]+'\',homework=\''+data[i]["info"][j]["homework_name"]+'\',subject=\''+i+'\')">确定</button>\
+											</div>\
+										</div>\
+									</div>\
+								</div>\
+								');
+						}
+						
+						!function morrischart($) {
+							"use strict";
+							var MorrisCharts = function () {
+							};
+								//creates Bar chart
+								MorrisCharts.prototype.createBarChart = function (element, data, xkey, ykeys, labels, lineColors) {
+									Morris.Bar({
+										element: element,
+										data: data,
+										xkey: xkey,
+										ykeys: ykeys,
+										labels: labels,
+										gridLineColor: '#eef0f2',
+										barSizeRatio: 0.4,
+										resize: true,
+										hideHover: 'auto',
+										barColors: lineColors
+									});
+								},
+						
+								//creates area chart
+								MorrisCharts.prototype.createAreaChart = function (element, data, xkey, ykeys, labels, lineColors) {
+									Morris.Area({
+										element: element,
+										pointSize: 0,
+										lineWidth: 0,
+										data: data,
+										xkey: xkey,
+										ykeys: ykeys,
+										xLabels: "day",
+										labels: labels,
+										resize: true,
+										gridLineColor: '#eee',
+										hideHover: 'auto',
+										lineColors: lineColors,
+										fillOpacity: .6,
+										behaveLikeLine: true
+									});
+								},
+						
+								//creates Donut chart
+								MorrisCharts.prototype.createDonutChart = function (element, data, colors) {
+									Morris.Donut({
+										element: element,
+										data: data,
+										resize: true,
+										colors: colors
+									});
+								},
+								//creates Stacked chart
+								MorrisCharts.prototype.createStackedChart = function (element, data, xkey, ykeys, labels, lineColors) {
+									Morris.Bar({
+										element: element,
+										data: data,
+										xkey: xkey,
+										ykeys: ykeys,
+										stacked: true,
+										labels: labels,
+										hideHover: 'auto',
+										barSizeRatio: 0.4,
+										resize: true, //defaulted to true
+										gridLineColor: '#eeeeee',
+										barColors: lineColors
+									});
+								},
+								MorrisCharts.prototype.init = function () {
+									//creating morris-area-system-judge chart
+									var $areaData1 = [
+										{date: data[i]["info"][j]["homework_time"], num: data[i]["info"][j]["hand_in_num"]}
+									]
+									this.createBarChart('morris-'+i+'-'+data[i]["info"][j]["homework_name"]+'-handin', $areaData1, 'date', ['num'], [data[i]["info"][j]["homework_name"]+'的上交人数'], ['#655be6']);
+									var $areaData2 = [
+										{date: data[i]["info"][j]["homework_time"], num: data[i]["info"][j]["un_hand_in_num"]}
+									]
+									this.createBarChart('morris-'+i+'-'+data[i]["info"][j]["homework_name"]+'-unhandin', $areaData2, 'date', ['num'], [data[i]["info"][j]["homework_name"]+'的上交人数'], ['#1699dd']);
+									
+									
+									//creating donut chart
+									var $donutData = [
+										{label: "提交", value: data[i]["info"][j]["hand_in_num"]},
+										{label: "未提交", value: data[i]["info"][j]["un_hand_in_num"]},
+									];
+									this.createDonutChart('morris-sum-'+i+'-'+data[i]["info"][j]["homework_name"]+'-chart', $donutData, ['#655be6', '#1699dd']);						
+								},
+								//init
+								$.MorrisCharts = new MorrisCharts, $.MorrisCharts.Constructor = MorrisCharts
+						}(window.jQuery),
+						
+						//initializing 
+							function ($) {
+								"use strict";
+								$.MorrisCharts.init();
+							}(window.jQuery);
+						
+					}
+				}
+			},
+			error:function(){
+				mdui.snackbar({
+				message: 'ERROR: run time error! check your network! '
+				});
+			}
+		});
+	});
+</script>
+{% endblock%}
