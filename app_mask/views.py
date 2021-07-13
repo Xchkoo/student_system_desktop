@@ -59,7 +59,7 @@ def register():
             filename = file.filename
             ext = filename.rsplit('.', 1)[1]
             filename = create_uuid() + '.' + ext
-            file.save(config.APP_PATH + "/"+app.config['UPLOAD_FOLDER'] + 'REGISTER/'+ filename)
+            file.save(config.APP_PATH + "/"+app.config['UPLOAD_FOLDER'] + 'REGISTER/' + filename)
             # 转到数据库存储
             trans_id = local_db.register_trans(name=name, path=app.config['UPLOAD_FOLDER'] + 'REGISTER/' + filename)
             # 上传百度云
