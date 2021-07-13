@@ -1,6 +1,6 @@
 from flask import g
 import sqlite3
-from app_mask import config
+from app_mask import config, app
 
 
 def get_db():
@@ -8,6 +8,13 @@ def get_db():
     if db is None:
         db = g._database = sqlite3.connect(config.DATABASE)
     return db
+
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 
 def class_add_photo(name, path, lesson, time, annotation):

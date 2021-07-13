@@ -17,3 +17,5 @@ build/
 /Foxia/
 
 /.idea/
+/debug.log
+/access.log
