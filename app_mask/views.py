@@ -3,10 +3,21 @@ import json
 import os
 import random
 import sys
-
+from flask_login import login_manager
+from flask_login import UserMixin
 from flask import render_template, request, jsonify, make_response, send_from_directory
-
 from app_mask import app, config, local_db, face_detect, ocr
+
+
+
+@login_manager.user_loader
+def load_user(userid):
+    return User.get(userid)
+
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
 
 
 @app.route('/', methods=['GET'])

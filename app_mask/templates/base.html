@@ -131,9 +131,9 @@
 	<div id="hide">
 		{% block hide %}{% endblock %}
 	</div>
-    <div id="content">
-	{% block content %}{% endblock %}
-	</div>
+  <div id="content">
+    {% block content %}{% endblock %}
+  </div>
 {% block script %}
 <script src="/static/jquery/jquery-3.4.1.js"></script>
 <script src="/static/js/jquery.form.min.js"></script>
@@ -170,6 +170,14 @@ drawer.addEventListener('closed.mdui.drawer', function () {
     });
 	}
 </script>
+
+{% for message in get_flashed_messages() %}
+<script>
+  mdui.snackbar({
+      message: '{{ message }}'
+    });
+</script>
+{% endfor %}
 {% endblock %}
 </body>
 </html>
