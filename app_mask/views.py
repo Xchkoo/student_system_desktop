@@ -8,7 +8,8 @@ from flask_login import UserMixin
 from flask import render_template, request, jsonify, make_response, send_from_directory
 from app_mask import app, config, local_db, face_detect, ocr
 
-
+class User(UserMixin):
+    pass
 
 @login_manager.user_loader
 def load_user(userid):
@@ -17,6 +18,8 @@ def load_user(userid):
 
 @app.route('/login')
 def login():
+    if request.method == 'POST':
+        pass
     return render_template('login.html')
 
 
