@@ -17,7 +17,7 @@
         <link href="/static/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
         <link href="/static/assets/css/metismenu.min.css" rel="stylesheet" type="text/css">
         <link href="/static/css/style.css" rel="stylesheet" type="text/css">
-
+		<link rel="stylesheet" href="/static/mdui/css/mdui.min.css"/>
     </head>
 
 
@@ -46,7 +46,7 @@
 
                     <div class="p-3">
                         
-                        <form class="form-horizontal m-t-10" action="index.html">
+                        <form id="user">
 
                             <div class="form-group">
                                 <label for="username">Username</label>
@@ -66,13 +66,7 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-6 text-right">
-                                    <button class="btn btn-primary w-md waves-effect waves-light" type="submit">Log In</button>
-                                </div>
-                            </div>
-
-                            <div class="form-group m-t-30 mb-0 row">
-                                <div class="col-12 text-center">
-                                    <a href="pages-recoverpw.html" class="text-muted"><i class="mdi mdi-lock"></i> Forgot your password?</a>
+                                    <button class="btn btn-primary w-md waves-effect waves-light" type="submit" id="logInBtn">Log In</button>
                                 </div>
                             </div>
                         </form>
@@ -99,6 +93,37 @@
         <script src="/static/assets/js/modernizr.min.js"></script>
         <script src="/static/assets/js/metisMenu.min.js"></script>
         <script src="/static/js/app.js"></script>
-
+		<script src="/static/mdui/js/mdui.min.js"></script>
+		<script>
+			$(function(){
+					$("#logInBtn").click(function(){
+						$("#user").ajaxForm({
+							url: "/login",
+							type: "POST",
+							dataType: 'json',
+							clearForm: true,
+							beforeSubmit:function(){
+								load = mdui.snackbar({
+									message: "loading...",
+									timeout: 0,
+									closeOnOutsideClick: false
+								});
+							},
+							success:function(res){
+								load.close();
+								mdui.snackbar({
+									message: res['msg']
+								});
+							},
+							error:function(){
+								load.close();
+								mdui.snackbar({
+									message: 'error!'
+								});
+							}
+						})
+					})
+			});
+		</script>
     </body>
 </html>
