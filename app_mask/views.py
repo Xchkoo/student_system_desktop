@@ -2,9 +2,113 @@ import datetime
 import json
 import os
 import random
-import sys
 from flask import render_template, request, jsonify, make_response, send_from_directory, url_for, redirect
-from app_mask import app, config, local_db, face_detect, ocr
+from app_mask import app, config, local_db, face_detect, ocr, login_manager
+from werkzeug.security import generate_password_hash, check_password_hash
+import uuid
+from flask_login import UserMixin, login_required, current_user, login_user, logout_user
+ # 引入用户基类
+
+
+USERS = [
+    {
+        "id": 1,
+        "name": 'xchkoo',
+        "mail": "Xchkoo@foxmail.com",
+        "sex": "male",
+        "position": "Hangzhou",
+        "status": "Admin",
+        "password": generate_password_hash('123')
+    }
+]
+
+
+def create_user(user_name, password):
+    """创建一个用户"""
+    user = {
+        "name": user_name,
+        "password": generate_password_hash(password),
+        "id": uuid.uuid4()
+    }
+    USERS.append(user)
+
+
+def get_user(user_name):
+    """根据用户名获得用户记录"""
+    for user in USERS:
+        if user.get("name") == user_name:
+            return user
+    return None
+
+
+class User(UserMixin):
+    """用户类"""
+    def __init__(self, user):
+        self.username = user.get("name")
+        self.password_hash = user.get("password")
+        self.id = user.get("id")
+
+    def verify_password(self, password):
+        """密码验证"""
+        if self.password_hash is None:
+            return False
+        return check_password_hash(self.password_hash, password)
+
+    def get_id(self):
+        """获取用户ID"""
+        return self.id
+
+    @staticmethod
+    def get(user_id):
+        """根据用户ID获取用户实体，为 login_user 方法提供支持"""
+        if not user_id:
+            return None
+        for user in USERS:
+            if user.get('id') == user_id: # user["id"]
+                return User(user)
+        return None
+
+
+@login_manager.user_loader  # 定义获取登录用户的方法
+def load_user(user_id):
+    return User.get(user_id)
+
+
+@app.route('/login/', methods=['GET', 'POST'])  # 登录
+def login():
+    if request.method == 'POST':
+        user_name = request.form['username']
+        user_passwd = request.form['userpasswd']
+        user_remember_me = False
+        if request.form['remember_me'] == 'on':
+            user_remember_me = True
+        user_info = get_user(user_name)
+        if user_info is None:
+            msg = "用户名或密码有误"
+            return jsonify({'msg': msg})
+        else:
+            user = User(user_info)  # 创建用户实体
+            if user.verify_password(user_passwd):  # 校验密码
+                login_user(user, remember = user_remember_me)  # 创建用户 Session
+                msg = "登录成功"
+                return jsonify({'msg': msg, 'status': 'success'})
+            else:
+                msg = "用户名或密码有误"
+                return jsonify({'msg': msg})
+    return render_template('login.html')
+
+
+@app.route('/logout')  # 登出
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+
+@app.route("/settings", methods=['GET'])
+@login_required
+def settings():
+    pass
 
 
 @app.route('/', methods=['GET'])
@@ -12,7 +116,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/home/', methods=["GET"])
+@app.route('/home/', methods=['GET'])
 def home():
     return render_template('index.html')
 
@@ -22,12 +126,13 @@ def about():
     return render_template('about.html')
 
 
-@app.route('/console/', methods=["GET", "POST"])
+@app.route('/console/', methods=['GET'])
+@login_required
 def console():
-    return render_template('console.html')
+    return render_template('console.html', username=current_user.username)
 
 
-@app.route('/face_view/', methods=['GET', 'POST'])
+@app.route('/face_view/', methods=['GET'])
 def face_view():
     return render_template('face_view.html')
 
@@ -306,8 +411,8 @@ def api_get_pic(path):
 @app.route('/download/<path:path>', methods=['GET'])
 def download(path):
     path, filename = os.path.split(path)
-    apath = config.APP_PATH.replace('\\', '/') + '/'
-    return send_from_directory(apath + path, filename=filename, as_attachment=True)
+    # apath = config.APP_PATH.replace('\\', '/') + '/'
+    return send_from_directory(config.APP_PATH + path, filename=filename, as_attachment=True)
 
 
 @app.route('/api/search_check_result/', methods=['POST'])

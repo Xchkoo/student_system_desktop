@@ -54,15 +54,39 @@
 			</div>
 		</div>
 	</div>
+
+
+
+
+  
 <div class="mdui-toolbar">
   <a id="toggle" class="mdui-btn mdui-btn-icon "><i class="mdui-icon material-icons">menu</i></a>
   <span class="mdui-typo-title"><div align="center">
   {% block top %}中学生综合素质评定系统{% endblock %}
   </div></span>
+
   <div class="mdui-toolbar-spacer"></div>
-	  <a href="/search/" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>
 	  <a href="" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">refresh</i></a>
+  
+    <a class="nav-link dropdown-toggle arrow-none waves-effect nav-user" data-toggle="dropdown" role="button" mdui-menu="{target: '#example-attr'}" aria-haspopup="false" aria-expanded="false">
+          <i class="mdui-icon material-icons">account_circle</i>
+          <span class="d-none d-md-inline-block ml-1">{{ username }}<i class="mdi mdi-chevron-down"></i> </span>
+    </a>
+      <ul class="mdui-menu" id="example-attr">
+        <li class="mdui-menu-item">
+          <a href="/settings" class="mdui-ripple">设置</a>
+        </li>
+        <li class="mdui-divider"></li>
+        <li class="mdui-menu-item">
+          <a href="/logout" class="mdui-ripple">登出</a>
+        </li>
+    </ul>
   </div>
+
+
+
+
+
   <div class="mdui-drawer mdui-color-grey-300" id="drawer">
   <ul class="mdui-list" mdui-collapse="{accordion: false}">
   
@@ -116,7 +140,7 @@
 	</li>
   </ul>
   </div>
-  <div class="mdui-fab-wrapper" id="Fab" mdui-fab="{trigger: 'click'}">
+  <!-- <div class="mdui-fab-wrapper" id="Fab" mdui-fab="{trigger: 'click'}">
     <button class="mdui-fab mdui-ripple">
 	<i class="mdui-icon material-icons mdui-color-white">add</i>
     <i class="mdui-icon mdui-fab-opened material-icons mdui-color-white">add</i>
@@ -127,7 +151,7 @@
       <button class="mdui-fab mdui-fab-mini mdui-ripple mdui-color-deep-purple-accent"><a class='mdui-color-black' href='/search/'><i class="mdui-icon material-icons">search</i></a></button>
       <button class="mdui-fab mdui-fab-mini mdui-ripple mdui-color-deep-purple-accent"><a class='mdui-color-black' href='/'><i class="mdui-icon material-icons">home</i></a></button>
     </div>
-  </div>
+  </div> -->
 	<div id="hide">
 		{% block hide %}{% endblock %}
 	</div>

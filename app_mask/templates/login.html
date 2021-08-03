@@ -5,7 +5,7 @@
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
-        <title>Foxia - Responsive Bootstrap 4 Admin Dashboard</title>
+        <title>登录 - 中学生综合素质评定系统</title>
         <meta content="Admin Dashboard" name="description" />
         <meta content="Themesbrand" name="author" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -38,8 +38,8 @@
 
                     <div class="p-3">
                         <div class="float-right text-right">
-                            <h4 class="font-18 mt-3 m-b-5">Welcome Back !</h4>
-                            <p class="text-muted">Sign in to continue to student system.</p>
+                            <h4 class="font-18 mt-3 m-b-5">欢迎回来!</h4>
+                            <p class="text-muted">登录以进行更多操作</p>
                         </div>
                         <a href="index.html" class="logo-admin"><img src="/static/image/favicon.ico" height="26" alt="logo"></a>
                     </div>
@@ -47,26 +47,24 @@
                     <div class="p-3">
                         
                         <form id="user">
-
                             <div class="form-group">
-                                <label for="username">Username</label>
-                                <input type="text" class="form-control" id="username" placeholder="Enter username">
+                                <label for="username">用户名</label>
+                                <input type="text" class="form-control" id="username" name="username" placeholder="Enter username">
                             </div>
 
                             <div class="form-group">
-                                <label for="userpassword">Password</label>
-                                <input type="password" class="form-control" id="userpassword" placeholder="Enter password">
+                                <label for="userpassword">密码</label>
+                                <input type="password" class="form-control" id="userpasswd" name="userpasswd" placeholder="Enter password">
                             </div>
-
                             <div class="form-group row m-t-30">
                                 <div class="col-sm-6">
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="customControlInline">
-                                        <label class="custom-control-label" for="customControlInline">Remember me</label>
+                                        <input type="checkbox" class="custom-control-input" id="remember_me" name="remember_me" checked=true>
+                                        <label class="custom-control-label" for="remember_me">记住我</label>
                                     </div>
                                 </div>
                                 <div class="col-sm-6 text-right">
-                                    <button class="btn btn-primary w-md waves-effect waves-light" type="submit" id="logInBtn">Log In</button>
+                                    <button class="btn btn-primary w-md waves-effect waves-light" type="submit" id="loginBtn">登录</button>
                                 </div>
                             </div>
                         </form>
@@ -96,34 +94,38 @@
 		<script src="/static/mdui/js/mdui.min.js"></script>
 		<script>
 			$(function(){
-					$("#logInBtn").click(function(){
-						$("#user").ajaxForm({
-							url: "/login",
-							type: "POST",
-							dataType: 'json',
-							clearForm: true,
-							beforeSubmit:function(){
-								load = mdui.snackbar({
-									message: "loading...",
-									timeout: 0,
-									closeOnOutsideClick: false
-								});
-							},
-							success:function(res){
-								load.close();
-								mdui.snackbar({
-									message: res['msg']
-								});
-							},
-							error:function(){
-								load.close();
-								mdui.snackbar({
-									message: 'error!'
-								});
-							}
-						})
-					})
+                $("#loginBtn").click(function(){
+                    $("#user").ajaxForm({
+                        url: "/login",
+                        type: "POST",
+                        dataType: 'json',
+                        clearForm: true,
+                        beforeSubmit:function(){
+                            load = mdui.snackbar({
+                                message: "loading...",
+                                timeout: 0,
+                                closeOnOutsideClick: false
+                            });
+                        },
+                        success:function(res){
+                            load.close();
+                            mdui.snackbar({
+                                message: res['msg']
+                            });
+                            if(res['status'] == 'success'){
+                                window.location.href="/console";
+                            }
+                        },
+                        error:function(){
+                            load.close();
+                            mdui.snackbar({
+                                message: 'internet error'
+                            });
+                        }
+                    })
+                })
 			});
 		</script>
     </body>
 </html>
+

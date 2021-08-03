@@ -1,5 +1,5 @@
 import sys
-from app_mask import app
+
 
 APP_PATH = sys.path[0]
 ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'raw', 'png', 'bmp', 'PNG', 'JPG', 'BMP', 'RAW']
